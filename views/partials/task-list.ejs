@@ -1,0 +1,17 @@
+<h2>Tasks:</h2>
+<ul class="tasks-list">
+  <% tasks.forEach(function(task, index) { %>
+    <li class="tasks-list__item">
+      <div class="task-item-container">
+        <label class="custom-checkbox-label">
+          <input type="checkbox" id="checkbox<%= index %>" class="custom-checkbox" autocomplete="off">
+          <span id="taskText<%= index %>"><%= task %></span>
+        </label>
+      </div>
+      <form action="<%= removeTaskAction %>" method="POST">
+        <input type="hidden" name="index" value="<%= index %>">
+        <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+      </form>
+    </li>
+  <% }); %>
+</ul>

@@ -1,0 +1,36 @@
+    <%- include("partials/header.ejs") %>
+    <div class="container mt-5 custom-container" >
+      <div class="row">
+        <div class="col-lg-12">
+          <h1 class="heading">Today's Tasks</h1>
+      <p class="date">Current Date: <%= currentDate %></p>
+          <form action="/addTask" method="POST">
+            <div class="mb-3">
+              <label for="task" class="form-label">New Task</label>
+              <div class="input-container"> 
+                <input type="text" class="form-control" id="task" name="task" required>
+                <button type="submit" class="btn btn-primary custom-btn">Add Task</button>
+              </div>
+            </div>
+          </form>
+          <h2>Tasks:</h2>
+          <ul class="tasks-list">
+            <% tasks.forEach(function(task, index) { %>
+              <li class="tasks-list__item">
+                <div class="task-item-container">
+                  <label class="custom-checkbox-label">
+                    <input type="checkbox" id="checkbox<%= index %>" class="custom-checkbox" autocomplete="off">
+                    <span id="taskText<%= index %>"><%= task %></span>
+                  </label>
+                </div>
+                <form action="/removeTask" method="POST">
+                  <input type="hidden" name="index" value="<%= index %>">
+                  <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+                </form>
+              </li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <%- include("partials/footer.ejs") %>
