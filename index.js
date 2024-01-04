@@ -1,59 +1,54 @@
-import express from "express";
+const express = require('express');
+
+const db = require('./data/database');
 
 const app = express();
 const port = 3000;
-const tasks = [];
 
-app.use(express.static("public"));
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
-app.set('view engine', 'ejs'); 
+app.set('view engine', 'ejs');
 
 function getCurrentDate() {
   const currentDate = new Date();
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  const options = {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  };
   return currentDate.toLocaleDateString('en-US', options);
 }
 
-
-
-app.get("/", (req, res) => {
-  res.render("index", { currentDate: getCurrentDate(), tasks: tasks });
+app.get('/', (req, res) => {
+  db.query('SELECT * FROM tasks', (error, results) => {
+    if (error) {
+      throw error;
+    }
+    res.render('index', { currentDate: getCurrentDate(), tasks: results });
+  });
 });
 
-app.get("/work", (req, res) => {
-  res.render("work",{ currentDate: getCurrentDate(), tasks: tasks });
-});
-
-app.post("/addWorkTask", (req, res) => {
+app.post('/addTask', (req, res) => {
   const newTask = req.body.task;
-  if (newTask.trim() !== "") { 
-    tasks.push(newTask);
+  if (newTask.trim() !== '') {
+    db.query('INSERT INTO tasks (task) VALUES (?)', [newTask], (error) => {
+      if (error) {
+        throw error;
+      }
+      res.redirect('/');
+    });
   }
-  res.redirect("/work"); 
 });
 
-app.post("/addTask", (req, res) => {
-  const newTask = req.body.task;
-  if (newTask.trim() !== "") { 
-    tasks.push(newTask);
-  }
-  res.redirect("/"); 
-});
-
-app.post("/removeTask", (req, res) => {
+app.post('/removeTask', (req, res) => {
   const indexToRemove = req.body.index;
-  if (indexToRemove >= 0 && indexToRemove < tasks.length) {
-    tasks.splice(indexToRemove, 1);
-  }
-  res.redirect("/");
-});
-
-app.post("/removeWorkTask", (req, res) => {
-  const indexToRemove = req.body.index;
-  if (indexToRemove >= 0 && indexToRemove < tasks.length) {
-    tasks.splice(indexToRemove, 1);
-  }
-  res.redirect("/work");
+  db.query('DELETE FROM tasks WHERE id = ?', [indexToRemove], (error) => {
+    if (error) {
+      throw error;
+    }
+    res.redirect('/');
+  });
 });
 
 app.listen(port, () => {
